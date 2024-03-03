@@ -1,0 +1,47 @@
+repos:
+  - repo: https://github.com/python-poetry/poetry
+    rev: '1.6.1'
+    hooks:
+      - id: poetry-export
+        name: Export poetry dependencies
+        args: ["-C", "./requirements", "--with", "dev", "-f", "requirements.txt", "-o", "./requirements/requirements.txt"]
+        verbose: true
+        files: pyproject.toml
+  - repo: local
+    hooks:
+      - id: black
+        name: Black Python code formatting
+        entry: bash -c 'black "$@"' --
+        language: python
+        types: [python]
+        hooks:
+      - id: autoflake
+        name: Remove unused variables and imports
+        entry: bash -c 'autoflake "$@"' --
+        language: python
+        args:
+          [
+            '--in-place',
+            '--remove-all-unused-imports',
+            '--remove-unused-variables',
+            '--expand-star-imports',
+            '--ignore-init-module-imports',
+          ]
+        files: \.py$
+      - id: flake8
+        name: Check style with flake8
+        entry: bash -c 'flake8 "$@"' --
+        language: python
+        args: []
+        files: \.py$
+      - id: isort
+        name: Sorting import statements
+        entry: bash -c 'isort "$@"' --
+        language: python
+        args: ['--filter-files', '--color']
+        files: \.py$
+      - id: prettier
+        name: Run prettier on code
+        entry: bash -c 'pnpm run format'
+        language: system
+        files: \.ts*$
